@@ -46,7 +46,7 @@ class TinypicPlugin:
         self.headers = {'User-Agent': useragent}
         self.regex = re.compile(r'^(.*?\.)?tinypic\.com$')
 
-    def import_submission(self, submission: praw.objects.Submission) -> dict:
+    def import_submission(self, submission: praw) -> dict:
         """Import a submission from tinypic. Uses raw HTML scraping.
 
         Because this downloads the page and tries to scrape the HTML,

@@ -46,7 +46,7 @@ class DrawcrowdPlugin:
         self.headers = {'User-Agent': useragent}
         self.regex = re.compile(r'^(.*?\.)?drawcrowd\.com$')
 
-    def import_submission(self, submission: praw.objects.Submission) -> dict:
+    def import_submission(self, submission: praw) -> dict:
         """Import a submission from drawcrowd. Uses raw HTML scraping.
 
         As it turns out, drawcrowd likes to provide different data

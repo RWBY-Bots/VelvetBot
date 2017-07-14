@@ -27,6 +27,7 @@ import traceback
 import mimeparse
 
 import imgurpython
+import requests
 from imgurpython.helpers.error import ImgurClientRateLimitError
 
 

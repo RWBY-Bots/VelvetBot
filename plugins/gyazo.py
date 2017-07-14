@@ -26,7 +26,7 @@ class GyazoPlugin:
         self.headers = {'User-Agent': useragent}
         self.regex = re.compile(r'^(.*?\.)?gyazo\.com$')
 
-    def import_submission(self, submission: praw.objects.Submission) -> dict:
+    def import_submission(self, submission: praw) -> dict:
         """ Import a submission from gyazo. Uses their oEmbed API.
 
         gyazo.com was nice enough to provide us with an oEmbed API.

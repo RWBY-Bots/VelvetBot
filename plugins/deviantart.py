@@ -60,7 +60,7 @@ class DeviantArtPlugin:
         """
         return requests.get(url, headers=self.headers).text
 
-    def import_submission(self, submission: praw.objects.Submission) -> dict:
+    def import_submission(self, submission: praw) -> dict:
         """Import a submission from deviantArt. Ignores flash content.
 
         Uses a combination of the DA backend and HTML scraping.
@@ -115,7 +115,7 @@ class DeviantArtPlugin:
 
             try:
                 # Trying to scrape manually
-                bs = BeautifulSoup(self.read_url(submission.url))
+                bs = BeautifulSoup(self.read_url(submission.url), "lxml")
 
                 # Checking for flash animation, because mirroring a preview
                 # for a flash animation is stupid
