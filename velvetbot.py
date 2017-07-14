@@ -136,16 +136,6 @@ class LapisLazuli:
         self.call_plugin_function('verify_options', self.options)
         self.call_plugin_function('login')
 
-    def load_previous_submissions(self) -> set:
-        db = sqlite3.connect('Vdatabase.db')
-        cursor = db.cursor()
-        subs = set()
-        cursor.execute("SELECT Submissionid FROM Vdatabase")
-        results = cursor.fetchall()
-        for row in results:
-            subs.add(str(row[0]))
-        return subs
-
     def call_plugin_function(self, func_name: str, *args, **kwargs) -> list:
         """Call all registered plugins with function <func_name>.
 
@@ -225,11 +215,6 @@ class LapisLazuli:
                                   user_agent=self.options['useragent'])
         self.sr = self.reddit.subreddit(self.options['subreddit'])
 
-        #for comment in self.reddit.redditor('Velvetbot').comments.new(limit=50):
-            #print("deleting:" + str(comment))
-            #comment.delete()
-            #time.sleep(2)
-
     def process_submission(self, submission: praw):
         """Process a single submission, replying with a mirror if needed.
 
@@ -270,7 +255,7 @@ class LapisLazuli:
                     links_display_parts.append(importer_display.get('footer', ''))
                     links_display = ''.join((links_display_parts))
                     text = (
-                        links_display + '\n\n---\n^(Velvet Mirror 0.7v)\n\n^[Creator](http://reddit.com/user/kupiakos) ^| ^[Source](https://github.com/spiral6/VelvetBot) ^| ^[Maintainer](http://reddit.com/user/spiral6) ^| ^[FAQ](https://www.reddit.com/r/RWBY/comments/4hsr39/heyo_folks_im_launching_an_image_mirroring_bot/)\n\n[^(If I made a mistake, let me know!)](/message/compose/?to=spiral6&amp;subject=VelvetBot) ')
+                        links_display + '\n\n---\n^(Lapis Mirror 0.7v)\n\n^[Creator](http://reddit.com/user/kupiakos) ^| ^[Source](https://github.com/spiral6/VelvetBot) ^| ^[Maintainer](http://reddit.com/user/spiral6) ^| ^[FAQ](https://www.reddit.com/r/RWBY/comments/4hsr39/heyo_folks_im_launching_an_image_mirroring_bot/)\n\n[^(If I made a mistake, let me know!)](/message/compose/?to=spiral6&amp;subject=VelvetBot) ')
         except Exception:
             pass
 
@@ -295,37 +280,28 @@ class LapisLazuli:
     def scan_submissions(self) -> None:
         """Accept the .
         """
-        subdone = self.load_previous_submissions()
+        done = []
         links = None
+        db = sqlite3.connect("Vdatabase.db")
+        db.text_factory = str
+        cursor = db.cursor()
+        cursor.execute("SELECT Submissionid FROM Vdatabase")
+        results = cursor.fetchall()
+        for row in results:
+            done.append(str(row[0]))
         while True:
             for submission in self.sr.stream.submissions():
-                if not str(submission.id) in subdone:
-                    if any(comment.author == "VelvetBot" for comment in submission.comments):
-                        self.log.debug('Have already commented here--moving on.')
-                        continue
-                    else:
-                        links = self.process_submission(submission)
-                        if links:
-                            db = sqlite3.connect("Vdatabase.db")
-                            db.text_factory = str
-                            cursor = db.cursor()
-                            cursor.execute('INSERT INTO Vdatabase VALUES (?, ?, ?, ?, ?, ?, ?)',
-                                           (str(submission.title), str(submission.id), str(submission.shortlink),
-                                            str(submission.permalink),
-                                            str(links), str(submission.author), int(submission.created_utc)))
-                            db.commit()
-                            subdone.add(submission.id)
-                    db = sqlite3.connect("Vdatabase.db")
-                    db.text_factory = str
-                    cursor = db.cursor()
-                    cursor.execute('INSERT INTO Vdatabase VALUES (?, ?, ?, ?, ?, ?, ?)',
-                               (str(submission.title), str(submission.id), str(submission.shortlink),
-                                str(submission.permalink),
-                                None, str(submission.author), int(submission.created_utc)))
-                    db.commit()
+                if str(submission.id) in done:
+                    pass
                 else:
-                    self.log.debug(submission.url)
-                    self.log.debug('Have already Processed here--moving on.')
+                    links = self.process_submission(submission)
+                    if links:
+                        cursor.execute('INSERT INTO Vdatabase VALUES (?, ?, ?, ?, ?, ?, ?)',
+                                       (str(submission.title), str(submission.id), str(submission.shortlink),
+                                        str(submission.permalink),
+                                        str(links), str(submission.author), int(submission.created_utc)))
+                        db.commit()
+                        done.append(str(submission.id))
 
     def verify_options(self) -> None:
         """Ensure that the provided options supply us with enough information."""
