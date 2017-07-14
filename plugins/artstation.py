@@ -47,7 +47,7 @@ class ArtstationPlugin:
         self.regex = re.compile(r'^(.*?\.)?artstation\.com$')
         self.pathregex = re.compile('r^/artwork/(.*?)/?$')
 
-    def import_submission(self, submission: praw.objects.Submission) -> dict:
+    def import_submission(self, submission: praw) -> dict:
         """Import a submission from Artstation. Parses the JSON API.
 
         Since Artstation uses Angular.js heavily, all we can try to do is

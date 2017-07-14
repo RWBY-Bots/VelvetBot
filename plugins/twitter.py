@@ -65,7 +65,7 @@ class TwitterPlugin:
         self.auth.set_access_token(self.access_token, self.access_token_secret)
         self.client = tweepy.API(self.auth)
 
-    def import_submission(self, submission: praw.objects.Submission) -> dict:
+    def import_submission(self, submission: praw) -> dict:
         """Import a submission from Twitter. Uses the Twitter API 1.1.
 
         This function will define the following values in its return data:

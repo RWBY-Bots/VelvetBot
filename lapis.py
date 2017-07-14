@@ -31,8 +31,8 @@ import logging
 import json
 import time
 import traceback
-
 import praw
+
 from mako.template import Template
 
 __author__ = 'kupiakos'
@@ -188,7 +188,7 @@ class LapisLazuli:
         except (AttributeError, praw.errors.PRAWException):
             pass
 
-    def get_submission_by_id(self, sub_id: str) -> praw.objects.Submission:
+    def get_submission_by_id(self, sub_id: str) -> praw.models.Submission:
         """Given a submission ID, load the actual submission object.
 
         Unused currently.
@@ -210,9 +210,7 @@ class LapisLazuli:
             self.options['plugins_dir'] = 'plugins'
             self.log.warning('plugins_dir not defined, using ' + self.options['plugins_dir'])
 
-        self.options['plugins_package'] = self.options.get(
-            'plugins_package',
-            self.options['plugins_dir']).replace('.', os.path.sep)
+        self.options['plugins_package'] = self.options.get('plugins_package',self.options['plugins_dir']).replace('.', os.path.sep)
         self.options['plugins_dir'] = os.path.join(get_script_dir(), self.options['plugins_dir'])
 
         self.log.debug('plugins_dir: ' + self.options['plugins_dir'])
@@ -235,7 +233,11 @@ class LapisLazuli:
     def login(self) -> None:
         """Log into required services, like Reddit."""
         self.log.info('Logging into Reddit...')
-        self.reddit = praw.Reddit(user_agent=self.options['useragent'])
+        oauth = self.options['reddit_oauth']
+        self.reddit = praw.Reddit(client_id=oauth['client_id'],
+                                  client_secret=oauth['client_secret'],
+                                  redirect_uri=oauth['redirect_uri'],
+                                  user_agent=self.options['useragent'])
         if self.use_oauth:
             self.oauth_authorize()
         else:
@@ -246,9 +248,9 @@ class LapisLazuli:
 
     def oauth_authorize(self):
         oauth = self.options['reddit_oauth']
-        self.reddit.set_oauth_app_info(client_id=oauth['client_id'],
-                                       client_secret=oauth['client_secret'],
-                                       redirect_uri=oauth['redirect_uri'])
+        #self.reddit.set_oauth_app_info(client_id=oauth['client_id'],
+                                       #client_secret=oauth['client_secret'],
+                                       #redirect_uri=oauth['redirect_uri'])
         self.access_information = {
             'access_token': oauth['access_token'],
             'refresh_token': oauth['refresh_token'],
@@ -259,10 +261,9 @@ class LapisLazuli:
         self.options['reddit_user'] = self.username
 
     def oauth_refresh(self):
-        self.access_information = self.reddit.refresh_access_information(
-            refresh_token=self.access_information['refresh_token'])
+        self.access_information = self.reddit.auth.authorize(['refresh_token'])
 
-    def process_submission(self, submission: praw.objects.Submission) -> None:
+    def process_submission(self, submission: praw.models.Submission) -> None:
         """Process a single submission, replying with a mirror if needed.
 
         :param submission: The Reddit submission to process.
