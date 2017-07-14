@@ -215,7 +215,7 @@ class LapisLazuli:
                                   user_agent=self.options['useragent'])
         self.sr = self.reddit.subreddit(self.options['subreddit'])
 
-    def process_submission(self, submission: praw.models.Submission):
+    def process_submission(self, submission: praw):
         """Process a single submission, replying with a mirror if needed.
 
         :param submission: The Reddit submission to process.
@@ -224,7 +224,7 @@ class LapisLazuli:
                        '        permalink:%s\n'
                        '        url:      %s',
                        submission.permalink, submission.url)
-        if any(comment.author.name == self.username
+        if any(comment.author.name == "VelvetBot"
                for comment in submission.comments if comment.author):
             self.log.debug('Have already commented here--moving on.')
             return
@@ -246,16 +246,19 @@ class LapisLazuli:
         if not any(export_table):
             self.log.warning('Imports done, but no exports.')
             return
+        try:
+            links_display_parts = []
+            for importer_display, export_results, _ in export_table:
+                links_display_parts.append(importer_display.get('header', ''))
+                for export_result in export_results:
+                    links_display_parts.append(export_result.get('link_display'))
+                    links_display_parts.append(importer_display.get('footer', ''))
+                    links_display = ''.join((links_display_parts))
+                    text = (
+                        links_display + '\n\n---\n^(Lapis Mirror 0.7v)\n\n^[Creator](http://reddit.com/user/kupiakos) ^| ^[Source](https://github.com/spiral6/VelvetBot) ^| ^[Maintainer](http://reddit.com/user/spiral6) ^| ^[FAQ](https://www.reddit.com/r/RWBY/comments/4hsr39/heyo_folks_im_launching_an_image_mirroring_bot/)\n\n[^(If I made a mistake, let me know!)](/message/compose/?to=spiral6&amp;subject=VelvetBot) ')
+        except Exception:
+            pass
 
-        links_display_parts = []
-        for importer_display, export_results, _ in export_table:
-            links_display_parts.append(importer_display.get('header', ''))
-            for export_result in export_results:
-                links_display_parts.append(export_result.get('link_display'))
-            links_display_parts.append(importer_display.get('footer', ''))
-        links_display = ''.join((links_display_parts))
-        text = (
-        links_display + '\n\n---\n^(Lapis Mirror 0.7v)\n\n^[Creator](http://reddit.com/user/kupiakos) ^| ^[Source](https://github.com/spiral6/VelvetBot) ^| ^[Maintainer](http://reddit.com/user/spiral6) ^| ^[FAQ](https://www.reddit.com/r/RWBY/comments/4hsr39/heyo_folks_im_launching_an_image_mirroring_bot/)\n\n[^(If I made a mistake, let me know!)](/message/compose/?to=spiral6&amp;subject=VelvetBot) ')
         try:
             submission.reply(text)
             self.log.info('Replied comment to %s', submission.permalink)
@@ -288,7 +291,9 @@ class LapisLazuli:
             done.append(str(row[0]))
         while True:
             for submission in self.sr.stream.submissions():
-                if not str(submission.id) in done:
+                if str(submission.id) in done:
+                    pass
+                else:
                     links = self.process_submission(submission)
                     if links:
                         cursor.execute('INSERT INTO Vdatabase VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -296,7 +301,7 @@ class LapisLazuli:
                                         str(submission.permalink),
                                         str(links), str(submission.author), int(submission.created_utc)))
                         db.commit()
-                        done.append(submission.id)
+                        done.append(str(submission.id))
 
     def verify_options(self) -> None:
         """Ensure that the provided options supply us with enough information."""
