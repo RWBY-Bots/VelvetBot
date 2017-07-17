@@ -102,8 +102,8 @@ class TwitterPlugin:
             data = {'author': 'the Twitter user {0} (@{1})'.format(author, handle),
                     'source': submission.url,
                     'importer_display': {
-                        'header': 'Mirrored Twitter image from {0} (@{1}):\n\n'.format(
-                            author, handle)},
+                        'header': 'Mirrored Twitter image from [{0}]({1}):\n\n'.format(
+                            author, "https://twitter.com/" + handle)},
                     # For some reason, Reddit is marking posts as spam with this enabled
                         # 'footer': 'Body:  \n{}'.format(body)},
                     'import_urls': image_urls}

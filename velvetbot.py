@@ -33,6 +33,7 @@ import time
 import traceback
 import praw
 import sqlite3
+from praw.models import MoreComments
 
 __author__ = 'kupiakos'
 __version__ = '0.7v'
@@ -224,8 +225,9 @@ class LapisLazuli:
                        '        permalink:%s\n'
                        '        url:      %s',
                        submission.permalink, submission.url)
+        submission.comments.replace_more(limit=0)
         if any(comment.author.name == "VelvetBot"
-               for comment in submission.comments if comment.author):
+               for comment in submission.comments.list() if comment.author):
             self.log.debug('Have already commented here--moving on.')
             return
 

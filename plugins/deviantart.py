@@ -107,15 +107,15 @@ class DeviantArtPlugin:
             data = {'author': response['author_name'],
                     'source': submission.url,
                     'importer_display':
-                        {'header': 'Mirrored deviantArt image by the author "{}":\n\n'.format(
-                            response['author_name'])}}
+                        {'header': 'Mirrored deviantArt image by [{0}]({1}):\n\n'.format(
+                            response['author_name'], "http://" + response['author_name'] + ".deviantart.com")}}
             if response['type'] == 'link':
                 data['import_urls'] = [response['fullsize_url']]
                 self.log.debug('Found DA API url %s', data['import_urls'])
 
             try:
                 # Trying to scrape manually
-                bs = BeautifulSoup(self.read_url(submission.url), "lxml")
+                bs = BeautifulSoup(self.read_url(submission.url))
 
                 # Checking for flash animation, because mirroring a preview
                 # for a flash animation is stupid
