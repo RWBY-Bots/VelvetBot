@@ -257,7 +257,7 @@ class LapisLazuli:
                     links_display_parts.append(importer_display.get('footer', ''))
                     links_display = ''.join((links_display_parts))
                     text = (
-                        links_display + '\n\n---\n^(Lapis Mirror 0.7v)\n\n^[Creator](http://reddit.com/user/kupiakos) ^| ^[Source](https://github.com/spiral6/VelvetBot) ^| ^[Maintainer](http://reddit.com/user/spiral6) ^| ^[FAQ](https://www.reddit.com/r/RWBY/comments/4hsr39/heyo_folks_im_launching_an_image_mirroring_bot/)\n\n[^(If I made a mistake, let me know!)](/message/compose/?to=spiral6&amp;subject=VelvetBot) ')
+                        links_display + '\n\n---\n^(VelvetBot V2)\n\n^[Creator](https://github.com/RWBY-Bots/VelvetBot) ^| ^[Source](https://github.com/spiral6/VelvetBot) ^| ^ [Forked from](https://github.com/kupiakos/LapisMirror) ^| ^[Maintainer](http://reddit.com/user/spiral6) ^| ^[FAQ](https://www.reddit.com/r/RWBY/comments/4hsr39/heyo_folks_im_launching_an_image_mirroring_bot/)\n\n[^(If I made a mistake, let me know!)](/message/compose/?to=spiral6&amp;subject=VelvetBot) ')
         except Exception:
             pass
 
